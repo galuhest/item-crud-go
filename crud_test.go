@@ -1,7 +1,6 @@
 package crud
 
 import "testing"
-// import "fmt"
 import "gopkg.in/DATA-DOG/go-sqlmock.v1"
 func TestGetUser(t *testing.T)	{
 	rows := sqlmock.NewRows([]string{"name"}).
@@ -76,4 +75,4 @@ func TestDeleteUser(t *testing.T)	{
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 	}
-}
+} 

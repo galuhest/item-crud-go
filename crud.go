@@ -1,3 +1,4 @@
+// Package ini dibuat untuk membungkus pemanggilan terhadap database.
 package crud
 
 import (
@@ -10,15 +11,20 @@ import (
 
 )
 
+// Struct ini adalah object kembalian dari
+// seluruh function dalam package ini. 
 type Response struct {
 	Status string `json:"status"` 
 	Payload map[string]string `json:"payload,omitempty"`
 }
 
+// init akan membaca file .env jika ada
 func init()	{
 	godotenv.Load()
 }
 
+// Function ini akan membuat koneksi terhadap database
+// berdasarkan parameter dalam .env
 func ConnectDb() *sql.DB {
 	db_config := fmt.Sprintf("%s:%s@/%s",os.Getenv("DB_USER"),os.Getenv("DB_PASSWORD"),os.Getenv("DATABASE"))
 	db, err := sql.Open("mysql", db_config)
@@ -28,6 +34,10 @@ func ConnectDb() *sql.DB {
 	return db
 }
 
+// GetItem akan mengembalikan nama dari user
+// berdasarkan id yang diberikan. Argumen pertama
+// adalah database yang digunakan, dan parameter kedua
+// adalah id dari user yang dicari.
 func GetItem(db *sql.DB, id int) string {
 	stmtOut, err := db.Prepare("SELECT name FROM item WHERE id = ?")
 	if err != nil {	
@@ -51,6 +61,9 @@ func GetItem(db *sql.DB, id int) string {
 	return string(js)
 }
 
+// CreateItem akan memasukan user baru kedalam database.
+// Function ini menerima object database sebagai parameter pertama,
+// dan nama user baru dari parameter kedua.
 func CreateItem(db *sql.DB, name string)	string {
 
 	stmtIns, err := db.Prepare("INSERT INTO item (name) VALUES(?)") // ? = placeholderl
@@ -87,6 +100,10 @@ func CreateItem(db *sql.DB, name string)	string {
 	return string(js)
 }
 
+// UpdateItem akan mengganti nama user dengan nama baru.
+// Function ini menerima 3 (tiga) parameter. Parameter
+// pertama adalah object database, parameter kedua adalah id user
+// yang ingin diganti namanya, dan parameter ketiga adalah nama baru.
 func UpdateItem(db *sql.DB, id int, name string) string	{
 	stmtIns, err := db.Prepare("update item set name = \"?\" where id = ?") // ? = placeholderl
 	if err != nil {
@@ -106,6 +123,9 @@ func UpdateItem(db *sql.DB, id int, name string) string	{
 	return string(js)	
 }
 
+// DeleteItem akan mengapus data user dari database berdasarkan id.
+// Function ini menerima object database sebagai parameter pertama,
+// dan id user yang ingin dihapus sebagai parameter kedua.
 func DeleteItem(db *sql.DB, id int)	string	{
 
 	stmtIns, err := db.Prepare("delete from item where id = ?") // ? = placeholderl
