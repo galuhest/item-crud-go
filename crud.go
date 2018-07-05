@@ -15,7 +15,7 @@ type Response struct {
 	Payload map[string]string `json:"payload,omitempty"`
 }
 
-func get(id int) string {
+func GetItem(id int) string {
 	err := godotenv.Load()
   if err != nil {
     panic(err.Error())
@@ -50,7 +50,7 @@ func get(id int) string {
 	return string(js)
 }
 
-func create(name string)	string {
+func CreateItem(name string)	string {
 	err := godotenv.Load()
   if err != nil {
     panic(err.Error())
@@ -97,7 +97,7 @@ func create(name string)	string {
 	return string(js)
 }
 
-func update(id int, name string) string	{
+func UpdateItem(id int, name string) string	{
 	err := godotenv.Load()
   if err != nil {
     panic(err.Error())
@@ -129,7 +129,7 @@ func update(id int, name string) string	{
 	return string(js)	
 }
 
-func delete(id int)	string	{
+func DeleteItem(id int)	string	{
 	err := godotenv.Load()
   if err != nil {
     panic(err.Error())
