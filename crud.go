@@ -15,17 +15,24 @@ type Response struct {
 	Payload map[string]string `json:"payload,omitempty"`
 }
 
-func GetItem(id int) string {
+func init()	{
 	err := godotenv.Load()
   if err != nil {
     panic(err.Error())
   }
+}
 
+func ConnectDb() *sql.DB {
 	db_config := fmt.Sprintf("%s:%s@/%s",os.Getenv("DB_USER"),os.Getenv("DB_PASSWORD"),os.Getenv("DATABASE"))
 	db, err := sql.Open("mysql", db_config)
 	if err != nil {
 		panic(err.Error())  // Just for example purpose. You should use proper error handling instead of panic
 	}
+	return db
+}
+
+func GetItem(id int) string {
+	db := ConnectDb()
 	defer db.Close()
 	
 	stmtOut, err := db.Prepare("SELECT name FROM item WHERE id = ?")
@@ -51,16 +58,7 @@ func GetItem(id int) string {
 }
 
 func CreateItem(name string)	string {
-	err := godotenv.Load()
-  if err != nil {
-    panic(err.Error())
-  }
-
-	db_config := fmt.Sprintf("%s:%s@/%s",os.Getenv("DB_USER"),os.Getenv("DB_PASSWORD"),os.Getenv("DATABASE"))
-	db, err := sql.Open("mysql", db_config)
-	if err != nil {
-		panic(err.Error())  // Just for example purpose. You should use proper error handling instead of panic
-	}
+	db := ConnectDb()
 	defer db.Close()
 
 	stmtIns, err := db.Prepare("INSERT INTO item (name) VALUES(?)") // ? = placeholderl
@@ -98,17 +96,7 @@ func CreateItem(name string)	string {
 }
 
 func UpdateItem(id int, name string) string	{
-	err := godotenv.Load()
-  if err != nil {
-    panic(err.Error())
-  }
-
-	db_config := fmt.Sprintf("%s:%s@/%s",os.Getenv("DB_USER"),os.Getenv("DB_PASSWORD"),os.Getenv("DATABASE"))
-	db, err := sql.Open("mysql", db_config)
-	if err != nil {
-		panic(err.Error())  // Just for example purpose. You should use proper error handling instead of panic
-	}
-
+	db := ConnectDb()
 	defer db.Close()
 
 	stmtIns, err := db.Prepare("update item set name = \"?\" where id = ?") // ? = placeholderl
@@ -130,16 +118,7 @@ func UpdateItem(id int, name string) string	{
 }
 
 func DeleteItem(id int)	string	{
-	err := godotenv.Load()
-  if err != nil {
-    panic(err.Error())
-  }
-
-	db_config := fmt.Sprintf("%s:%s@/%s",os.Getenv("DB_USER"),os.Getenv("DB_PASSWORD"),os.Getenv("DATABASE"))
-	db, err := sql.Open("mysql", db_config)
-	if err != nil {
-		panic(err.Error())  // Just for example purpose. You should use proper error handling instead of panic
-	}
+	db := ConnectDb()
 	defer db.Close()
 
 	stmtIns, err := db.Prepare("delete from item where id = ?") // ? = placeholderl

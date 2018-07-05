@@ -2,7 +2,6 @@ sudo: true
 language: go
 go:
   - 1.10.x
-  - 1.x
 services:
   - mysql
 addons:
