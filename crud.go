@@ -17,9 +17,6 @@ type Response struct {
 
 func init()	{
 	err := godotenv.Load()
-  if err != nil {
-    panic(err)
-  }
 }
 
 func ConnectDb() *sql.DB {
