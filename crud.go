@@ -18,7 +18,7 @@ type Response struct {
 func init()	{
 	err := godotenv.Load()
   if err != nil {
-    panic(err.Error())
+    panic(err)
   }
 }
 
@@ -31,13 +31,10 @@ func ConnectDb() *sql.DB {
 	return db
 }
 
-func GetItem(id int) string {
-	db := ConnectDb()
-	defer db.Close()
-	
+func GetItem(db *sql.DB, id int) string {
 	stmtOut, err := db.Prepare("SELECT name FROM item WHERE id = ?")
-	if err != nil {
-		panic(err.Error()) // proper error handling instead of panic in your app
+	if err != nil {	
+		panic(err) // proper error handling instead of panic in your app
 	}
 	defer stmtOut.Close()
 	
@@ -45,21 +42,19 @@ func GetItem(id int) string {
 
 	err = stmtOut.QueryRow(id).Scan(&name)
 	if err != nil {
-		panic(err.Error()) // proper error handling instead of panic in your app
+		panic(err) // proper error handling instead of panic in your app
 	}
 	payload := make(map[string]string)
 	payload["name"] = name
 	response := Response{"OK",payload}
 	js, err := json.Marshal(response)
 	if err != nil {
-    panic(err.Error())
+    panic(err)
   }
 	return string(js)
 }
 
-func CreateItem(name string)	string {
-	db := ConnectDb()
-	defer db.Close()
+func CreateItem(db *sql.DB, name string)	string {
 
 	stmtIns, err := db.Prepare("INSERT INTO item (name) VALUES(?)") // ? = placeholderl
 	if err != nil {
@@ -95,10 +90,7 @@ func CreateItem(name string)	string {
 	return string(js)
 }
 
-func UpdateItem(id int, name string) string	{
-	db := ConnectDb()
-	defer db.Close()
-
+func UpdateItem(db *sql.DB, id int, name string) string	{
 	stmtIns, err := db.Prepare("update item set name = \"?\" where id = ?") // ? = placeholderl
 	if err != nil {
 		panic(err.Error()) // proper error handling instead of panic in your app
@@ -117,9 +109,7 @@ func UpdateItem(id int, name string) string	{
 	return string(js)	
 }
 
-func DeleteItem(id int)	string	{
-	db := ConnectDb()
-	defer db.Close()
+func DeleteItem(db *sql.DB, id int)	string	{
 
 	stmtIns, err := db.Prepare("delete from item where id = ?") // ? = placeholderl
 	if err != nil {
