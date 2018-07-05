@@ -20,5 +20,6 @@ before_install:
 install:
   - go get github.com/joho/godotenv
   - go get -u github.com/go-sql-driver/mysql
+  - go get gopkg.in/DATA-DOG/go-sqlmock.v1
 script:
   - go test
