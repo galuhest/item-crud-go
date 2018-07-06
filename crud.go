@@ -4,6 +4,7 @@ package crud
 import (
 	"fmt"
 	"os"
+	"strconv"
   "encoding/json"
 	"database/sql"
 	"github.com/joho/godotenv"
@@ -91,7 +92,7 @@ func CreateItem(db *sql.DB, name string)	string {
 	}
 
 	payload := make(map[string]string)
-	payload["id"] = string(id)
+	payload["id"] = strconv.Itoa(id)
 	response := Response{"OK",payload}
 	js, err := json.Marshal(response)
 	if err != nil {
