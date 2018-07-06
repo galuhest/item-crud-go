@@ -1,0 +1,25 @@
+sudo: true
+language: go
+go:
+  - 1.10.x
+services:
+  - mysql
+addons:
+  apt:
+    sources:
+      - mysql-5.7-trusty
+    packages:
+      - mysql-server
+      - mysql-client  
+before_install: 
+  - gem install bundler -v 1.16.2
+  - sudo mysql -e 'create database onboarding; use onboarding; create table item (id INT NOT NULL AUTO_INCREMENT, name varchar(255), primary key (id))'
+  - sudo mysql -e "use mysql; update user set authentication_string=PASSWORD('root') where User='root'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"
+  - sudo mysql_upgrade -u root -proot
+  - sudo service mysql restart
+install:
+  - go get github.com/joho/godotenv
+  - go get -u github.com/go-sql-driver/mysql
+  - go get gopkg.in/DATA-DOG/go-sqlmock.v1
+script:
+  - go test
