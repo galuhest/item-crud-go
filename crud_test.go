@@ -34,7 +34,7 @@ func TestCreateUser(t *testing.T)	{
 	mock.ExpectPrepare("INSERT (.*)").ExpectExec().WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectPrepare("SELECT (.*)").ExpectQuery().WillReturnRows(rows)
 	// fmt.Println(CreateItem(db,"item N"))
-	if CreateItem(db,"item N") != "{\"status\":\"OK\",\"payload\":{\"id\":\"\\u0001\"}}" {
+	if CreateItem(db,"item N") != "{\"status\":\"OK\",\"payload\":{\"id\":\"1\"}}" {
 		t.Errorf("wrong json")
 	}
 	// we make sure that all expectations were met
@@ -49,7 +49,7 @@ func TestUpdateUser(t *testing.T)	{
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 	defer db.Close()
-	mock.ExpectPrepare("update (.*)").ExpectExec().WithArgs(1, "item N new!").WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectPrepare("update (.*)").ExpectExec().WithArgs("item N new!", 1).WillReturnResult(sqlmock.NewResult(1, 1))
 	// fmt.Println(CreateItem(db,"item N"))
 	if UpdateItem(db,1, "item N new!") != "{\"status\":\"OK\"}" {
 		t.Errorf("wrong json")

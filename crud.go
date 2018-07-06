@@ -106,13 +106,13 @@ func CreateItem(db *sql.DB, name string)	string {
 // pertama adalah object database, parameter kedua adalah id user
 // yang ingin diganti namanya, dan parameter ketiga adalah nama baru.
 func UpdateItem(db *sql.DB, id int, name string) string	{
-	stmtIns, err := db.Prepare("update item set name = \"?\" where id = ?") // ? = placeholderl
+	stmtIns, err := db.Prepare("update item set name = ? where id = ?") // ? = placeholderl
 	if err != nil {
 		panic(err.Error()) // proper error handling instead of panic in your app
 	}
 	defer stmtIns.Close() // Close the statement when we leave main() / the program terminates
 
-	_, err = stmtIns.Exec(id,name) // Insert tuples (i, i^2)
+	_, err = stmtIns.Exec(name,id) // Insert tuples (i, i^2)
 	if err != nil {
 		panic(err.Error()) // proper error handling instead of panic in your app
 	}
