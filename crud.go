@@ -39,7 +39,7 @@ func ConnectDb() (*sql.DB, error) {
 func GetItem(db *sql.DB, id int) (string, error){
     stmtOut, err := db.Prepare("SELECT name FROM item WHERE id = ?")
     if err != nil { 
-        return "", err // proper error handling instead of panic in your app
+        return "", err
     }
     defer stmtOut.Close()
     
@@ -63,16 +63,15 @@ func GetItem(db *sql.DB, id int) (string, error){
 // Function ini menerima object database sebagai parameter pertama,
 // dan nama user baru dari parameter kedua.
 func CreateItem(db *sql.DB, name string) (string, error) {
-
-    stmtIns, err := db.Prepare("INSERT INTO item (name) VALUES(?)") // ? = placeholderl
+    stmtIns, err := db.Prepare("INSERT INTO item (name) VALUES(?)")
     if err != nil {
         return "", err 
     }
-    defer stmtIns.Close() // Close the statement when we leave main() / the program terminates
+    defer stmtIns.Close()
     
-    _, err = stmtIns.Exec(name) // Insert tuples (i, i^2)
+    _, err = stmtIns.Exec(name)
     if err != nil {
-        panic(err.Error()) // proper error handling instead of panic in your app
+        panic(err.Error())
     }
 
     stmtOut, err := db.Prepare("SELECT LAST_INSERT_ID()")
@@ -103,13 +102,13 @@ func CreateItem(db *sql.DB, name string) (string, error) {
 // pertama adalah object database, parameter kedua adalah id user
 // yang ingin diganti namanya, dan parameter ketiga adalah nama baru.
 func UpdateItem(db *sql.DB, id int, name string) (string, error)    {
-    stmtIns, err := db.Prepare("update item set name = ? where id = ?") // ? = placeholderl
+    stmtIns, err := db.Prepare("update item set name = ? where id = ?")
     if err != nil {
         return "", err
     }
-    defer stmtIns.Close() // Close the statement when we leave main() / the program terminates
+    defer stmtIns.Close()
 
-    _, err = stmtIns.Exec(name,id) // Insert tuples (i, i^2)
+    _, err = stmtIns.Exec(name,id)
     if err != nil {
         return "", err
     }
@@ -125,14 +124,13 @@ func UpdateItem(db *sql.DB, id int, name string) (string, error)    {
 // Function ini menerima object database sebagai parameter pertama,
 // dan id user yang ingin dihapus sebagai parameter kedua.
 func DeleteItem(db *sql.DB, id int) (string, error) {
-
-    stmtIns, err := db.Prepare("delete from item where id = ?") // ? = placeholderl
+    stmtIns, err := db.Prepare("delete from item where id = ?")
     if err != nil {
         return "", err
     }
-    defer stmtIns.Close() // Close the statement when we leave main() / the program terminates
+    defer stmtIns.Close()
     
-    _, err = stmtIns.Exec(id) // Insert tuples (i, i^2)
+    _, err = stmtIns.Exec(id)
     if err != nil {
         return "", err
     }
