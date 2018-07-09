@@ -12,8 +12,11 @@ func TestGetUser(t *testing.T)	{
 	}
 	defer db.Close()
 	mock.ExpectPrepare("SELECT (.*) FROM (.*)").ExpectQuery().WithArgs(1).WillReturnRows(rows)
-
-	if GetItem(db,1) != "{\"status\":\"OK\",\"payload\":{\"name\":\"item N\"}}" {
+    res, err := GetItem(db,1)
+    if err != nil {
+        t.Errorf("something goes wrong 500")
+    }
+	if res != "{\"status\":\"OK\",\"payload\":{\"name\":\"item N\"}}" {
 		t.Errorf("wrong json")
 	}
 	// we make sure that all expectations were met
@@ -23,8 +26,9 @@ func TestGetUser(t *testing.T)	{
 }
 
 func TestCreateUser(t *testing.T)	{
+    var err error
 	rows := sqlmock.NewRows([]string{"id"}).
-  AddRow("1")
+    AddRow("1")
 
 	db, mock, err := sqlmock.New()
 	if err != nil {
@@ -34,7 +38,11 @@ func TestCreateUser(t *testing.T)	{
 	mock.ExpectPrepare("INSERT (.*)").ExpectExec().WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectPrepare("SELECT (.*)").ExpectQuery().WillReturnRows(rows)
 	// fmt.Println(CreateItem(db,"item N"))
-	if CreateItem(db,"item N") != "{\"status\":\"OK\",\"payload\":{\"id\":\"1\"}}" {
+    res, err := CreateItem(db,"item N")
+    if err != nil {
+        t.Errorf("something goes wrong 500")
+    }
+	if res != "{\"status\":\"OK\",\"payload\":{\"id\":\"1\"}}" {
 		t.Errorf("wrong json")
 	}
 	// we make sure that all expectations were met
@@ -51,7 +59,11 @@ func TestUpdateUser(t *testing.T)	{
 	defer db.Close()
 	mock.ExpectPrepare("update (.*)").ExpectExec().WithArgs("item N new!", 1).WillReturnResult(sqlmock.NewResult(1, 1))
 	// fmt.Println(CreateItem(db,"item N"))
-	if UpdateItem(db,1, "item N new!") != "{\"status\":\"OK\"}" {
+    res, err := UpdateItem(db,1, "item N new!")
+	if err != nil  {
+        t.Errorf("something goes wrong 500")
+    }
+    if res != "{\"status\":\"OK\"}" {
 		t.Errorf("wrong json")
 	}
 	// we make sure that all expectations were met
@@ -68,7 +80,11 @@ func TestDeleteUser(t *testing.T)	{
 	defer db.Close()
 	mock.ExpectPrepare("delete (.*)").ExpectExec().WithArgs(1).WillReturnResult(sqlmock.NewResult(1, 1))
 	// fmt.Println(CreateItem(db,"item N"))
-	if DeleteItem(db,1) != "{\"status\":\"OK\"}" {
+    res, err := DeleteItem(db,1)
+	if err != nil {
+        t.Errorf("something goes wrong")
+    }
+    if res != "{\"status\":\"OK\"}" {
 		t.Errorf("wrong json")
 	}
 	// we make sure that all expectations were met

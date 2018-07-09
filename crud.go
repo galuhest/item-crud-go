@@ -34,23 +34,20 @@ func init()	{
 
 // Function ini akan membuat koneksi terhadap database
 // berdasarkan parameter dalam .env
-func ConnectDb() *sql.DB {
+func ConnectDb() (*sql.DB, error) {
 	db_config := fmt.Sprintf("%s:%s@/%s",os.Getenv("DB_USER"),os.Getenv("DB_PASSWORD"),os.Getenv("DATABASE"))
 	db, err := sql.Open("mysql", db_config)
-	if err != nil {
-		panic(err.Error())  // Just for example purpose. You should use proper error handling instead of panic
-	}
-	return db
+	return db, err
 }
 
 // GetItem akan mengembalikan nama dari user
 // berdasarkan id yang diberikan. Argumen pertama
 // adalah database yang digunakan, dan parameter kedua
 // adalah id dari user yang dicari.
-func GetItem(db *sql.DB, id int) string {
-	stmtOut, err := db.Prepare("SELECT name FROM item WHERE id = ?")
+func GetItem(db *sql.DB, id int) (string, error){
+    stmtOut, err := db.Prepare("SELECT name FROM item WHERE id = ?")
 	if err != nil {	
-		panic(err) // proper error handling instead of panic in your app
+		return "", err // proper error handling instead of panic in your app
 	}
 	defer stmtOut.Close()
 	
@@ -58,26 +55,26 @@ func GetItem(db *sql.DB, id int) string {
 
 	err = stmtOut.QueryRow(id).Scan(&name)
 	if err != nil {
-		panic(err) // proper error handling instead of panic in your app
-	}
+        return "", err
+    }
 	payload := make(map[string]string)
 	payload["name"] = name
 	response := Response{"OK",payload}
 	js, err := json.Marshal(response)
 	if err != nil {
-    panic(err)
-  }
-	return string(js)
+        return "", err
+    }
+	return string(js), err
 }
 
 // CreateItem akan memasukan user baru kedalam database.
 // Function ini menerima object database sebagai parameter pertama,
 // dan nama user baru dari parameter kedua.
-func CreateItem(db *sql.DB, name string)	string {
+func CreateItem(db *sql.DB, name string) (string, error) {
 
 	stmtIns, err := db.Prepare("INSERT INTO item (name) VALUES(?)") // ? = placeholderl
 	if err != nil {
-		panic(err.Error()) // proper error handling instead of panic in your app
+		return "", err 
 	}
 	defer stmtIns.Close() // Close the statement when we leave main() / the program terminates
 	
@@ -88,7 +85,7 @@ func CreateItem(db *sql.DB, name string)	string {
 
 	stmtOut, err := db.Prepare("SELECT LAST_INSERT_ID()")
 	if err != nil {
-		panic(err.Error()) // proper error handling instead of panic in your app
+		return "", err
 	}
 	defer stmtOut.Close()
 	
@@ -96,7 +93,7 @@ func CreateItem(db *sql.DB, name string)	string {
 
 	err = stmtOut.QueryRow().Scan(&id)
 	if err != nil {
-		panic(err.Error()) // proper error handling instead of panic in your app
+		return "", err
 	}
 
 	payload := make(map[string]string)
@@ -104,54 +101,54 @@ func CreateItem(db *sql.DB, name string)	string {
 	response := Response{"OK",payload}
 	js, err := json.Marshal(response)
 	if err != nil {
-    panic(err.Error())
-  }
-	return string(js)
+        return "", err
+    }
+	return string(js), err
 }
 
 // UpdateItem akan mengganti nama user dengan nama baru.
 // Function ini menerima 3 (tiga) parameter. Parameter
 // pertama adalah object database, parameter kedua adalah id user
 // yang ingin diganti namanya, dan parameter ketiga adalah nama baru.
-func UpdateItem(db *sql.DB, id int, name string) string	{
+func UpdateItem(db *sql.DB, id int, name string) (string, error)	{
 	stmtIns, err := db.Prepare("update item set name = ? where id = ?") // ? = placeholderl
 	if err != nil {
-		panic(err.Error()) // proper error handling instead of panic in your app
+		return "", err
 	}
 	defer stmtIns.Close() // Close the statement when we leave main() / the program terminates
 
 	_, err = stmtIns.Exec(name,id) // Insert tuples (i, i^2)
 	if err != nil {
-		panic(err.Error()) // proper error handling instead of panic in your app
+		return "", err
 	}
 	response := Response{"OK",make(map[string]string)}
 	js, err := json.Marshal(response)
 	if err != nil {
-    panic(err.Error())
-  }
-	return string(js)	
+        return "", err
+    }
+	return string(js), err	
 }
 
 // DeleteItem akan mengapus data user dari database berdasarkan id.
 // Function ini menerima object database sebagai parameter pertama,
 // dan id user yang ingin dihapus sebagai parameter kedua.
-func DeleteItem(db *sql.DB, id int)	string	{
+func DeleteItem(db *sql.DB, id int)	(string, error)	{
 
 	stmtIns, err := db.Prepare("delete from item where id = ?") // ? = placeholderl
 	if err != nil {
-		panic(err.Error()) // proper error handling instead of panic in your app
+		return "", err
 	}
 	defer stmtIns.Close() // Close the statement when we leave main() / the program terminates
 	
 	_, err = stmtIns.Exec(id) // Insert tuples (i, i^2)
 	if err != nil {
-		panic(err.Error()) // proper error handling instead of panic in your app
+		return "", err
 	}
 
 	response := Response{"OK",make(map[string]string)}
 	js, err := json.Marshal(response)
 	if err != nil {
-    panic(err.Error())
-  }
-	return string(js)	
+        return "", err
+    }
+	return string(js), err	
 }
