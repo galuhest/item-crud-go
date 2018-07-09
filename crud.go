@@ -140,7 +140,7 @@ func DeleteItem(db *sql.DB, id int) (string, error) {
     response := Response{"OK",make(map[string]string)}
     js, err := json.Marshal(response)
     if err != nil {
-    return "", err
+        return "", err
     }
     return string(js), err  
 }
