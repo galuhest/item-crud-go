@@ -2,10 +2,9 @@ package crud
 
 import "testing"
 import "gopkg.in/DATA-DOG/go-sqlmock.v1"
-func TestGetUser(t *testing.T)	{
-	rows := sqlmock.NewRows([]string{"name"}).
+func TestGetUser(t *testing.T)  {
+    rows := sqlmock.NewRows([]string{"name"}).
     AddRow("item N")
-
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)

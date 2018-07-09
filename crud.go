@@ -19,14 +19,6 @@ type Response struct {
 	Payload map[string]string `json:"payload,omitempty"`
 }
 
-type Crud interface{
-	ConnectDb() *sql.DB
-	GetItem(db *sql.DB, id int) string
-	CreateItem(db *sql.DB, name string) string
-	UpdateItem(db *sql.DB, id int, name string) string
-	DeleteItem(db *sql.DB, id int) string
-}
-
 // init akan membaca file .env jika ada
 func init()	{
 	godotenv.Load()
