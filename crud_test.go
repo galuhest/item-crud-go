@@ -2,6 +2,7 @@ package crud
 
 import "testing"
 import "gopkg.in/DATA-DOG/go-sqlmock.v1"
+
 func TestGetUser(t *testing.T)  {
     rows := sqlmock.NewRows([]string{"name"}).
     AddRow("item N")
@@ -11,7 +12,8 @@ func TestGetUser(t *testing.T)  {
     }
     defer db.Close()
     mock.ExpectPrepare("SELECT (.*) FROM (.*)").ExpectQuery().WithArgs(1).WillReturnRows(rows)
-    res, err := GetItem(db,1)
+    mydb := &MyDb{db : db}
+    res, err := mydb.GetItem(1)
     if err != nil {
         t.Errorf("something goes wrong 500")
     }
@@ -37,7 +39,8 @@ func TestCreateUser(t *testing.T)   {
     mock.ExpectPrepare("INSERT (.*)").ExpectExec().WillReturnResult(sqlmock.NewResult(1, 1))
     mock.ExpectPrepare("SELECT (.*)").ExpectQuery().WillReturnRows(rows)
     // fmt.Println(CreateItem(db,"item N"))
-    res, err := CreateItem(db,"item N")
+    mydb := &MyDb{db : db}
+    res, err := mydb.CreateItem("item N")
     if err != nil {
         t.Errorf("something goes wrong 500")
     }
@@ -58,7 +61,8 @@ func TestUpdateUser(t *testing.T)   {
     defer db.Close()
     mock.ExpectPrepare("update (.*)").ExpectExec().WithArgs("item N new!", 1).WillReturnResult(sqlmock.NewResult(1, 1))
     // fmt.Println(CreateItem(db,"item N"))
-    res, err := UpdateItem(db,1, "item N new!")
+    mydb := &MyDb{db : db}
+    res, err := mydb.UpdateItem(1, "item N new!")
     if err != nil  {
         t.Errorf("something goes wrong 500")
     }
@@ -79,7 +83,8 @@ func TestDeleteUser(t *testing.T)   {
     defer db.Close()
     mock.ExpectPrepare("delete (.*)").ExpectExec().WithArgs(1).WillReturnResult(sqlmock.NewResult(1, 1))
     // fmt.Println(CreateItem(db,"item N"))
-    res, err := DeleteItem(db,1)
+    mydb := &MyDb{db : db}
+    res, err := mydb.DeleteItem(1)
     if err != nil {
         t.Errorf("something goes wrong")
     }

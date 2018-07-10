@@ -5,12 +5,16 @@ import (
     "fmt"
     "os"
     "strconv"
-  "encoding/json"
+    "encoding/json"
     "database/sql"
     "github.com/joho/godotenv"
     _ "github.com/go-sql-driver/mysql"
-
 )
+
+// Struct untuk membatasi DB
+type MyDb struct {
+    db *sql.DB
+}
 
 // Struct ini adalah object kembalian dari
 // seluruh function dalam package ini. 
@@ -26,18 +30,19 @@ func init() {
 
 // Function ini akan membuat koneksi terhadap database
 // berdasarkan parameter dalam .env
-func ConnectDb() (*sql.DB, error) {
+func ConnectDb() (*MyDb, error) {
     db_config := fmt.Sprintf("%s:%s@/%s",os.Getenv("DB_USER"),os.Getenv("DB_PASSWORD"),os.Getenv("DATABASE"))
     db, err := sql.Open("mysql", db_config)
-    return db, err
+    mydb := &MyDb{db : db}
+    return mydb, err
 }
 
 // GetItem akan mengembalikan nama dari user
 // berdasarkan id yang diberikan. Argumen pertama
 // adalah database yang digunakan, dan parameter kedua
 // adalah id dari user yang dicari.
-func GetItem(db *sql.DB, id int) (string, error){
-    stmtOut, err := db.Prepare("SELECT name FROM item WHERE id = ?")
+func (m *MyDb) GetItem(id int) (string, error){
+    stmtOut, err := m.db.Prepare("SELECT name FROM item WHERE id = ?")
     if err != nil { 
         return "", err
     }
@@ -62,8 +67,8 @@ func GetItem(db *sql.DB, id int) (string, error){
 // CreateItem akan memasukan user baru kedalam database.
 // Function ini menerima object database sebagai parameter pertama,
 // dan nama user baru dari parameter kedua.
-func CreateItem(db *sql.DB, name string) (string, error) {
-    stmtIns, err := db.Prepare("INSERT INTO item (name) VALUES(?)")
+func (m *MyDb) CreateItem(name string) (string, error) {
+    stmtIns, err := m.db.Prepare("INSERT INTO item (name) VALUES(?)")
     if err != nil {
         return "", err 
     }
@@ -74,7 +79,7 @@ func CreateItem(db *sql.DB, name string) (string, error) {
         panic(err.Error())
     }
 
-    stmtOut, err := db.Prepare("SELECT LAST_INSERT_ID()")
+    stmtOut, err := m.db.Prepare("SELECT LAST_INSERT_ID()")
     if err != nil {
         return "", err
     }
@@ -101,8 +106,8 @@ func CreateItem(db *sql.DB, name string) (string, error) {
 // Function ini menerima 3 (tiga) parameter. Parameter
 // pertama adalah object database, parameter kedua adalah id user
 // yang ingin diganti namanya, dan parameter ketiga adalah nama baru.
-func UpdateItem(db *sql.DB, id int, name string) (string, error)    {
-    stmtIns, err := db.Prepare("update item set name = ? where id = ?")
+func (m *MyDb) UpdateItem(id int, name string) (string, error)    {
+    stmtIns, err := m.db.Prepare("update item set name = ? where id = ?")
     if err != nil {
         return "", err
     }
@@ -123,8 +128,8 @@ func UpdateItem(db *sql.DB, id int, name string) (string, error)    {
 // DeleteItem akan mengapus data user dari database berdasarkan id.
 // Function ini menerima object database sebagai parameter pertama,
 // dan id user yang ingin dihapus sebagai parameter kedua.
-func DeleteItem(db *sql.DB, id int) (string, error) {
-    stmtIns, err := db.Prepare("delete from item where id = ?")
+func (m *MyDb) DeleteItem(id int) (string, error) {
+    stmtIns, err := m.db.Prepare("delete from item where id = ?")
     if err != nil {
         return "", err
     }
