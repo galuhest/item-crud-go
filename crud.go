@@ -37,6 +37,10 @@ func ConnectDb() (*MyDb, error) {
     return mydb, err
 }
 
+func (m *MyDb) CloseDb() (error)    {
+    return m.db.Close()
+}
+
 // GetItem akan mengembalikan nama dari user
 // berdasarkan id yang diberikan. Argumen pertama
 // adalah database yang digunakan, dan parameter kedua
