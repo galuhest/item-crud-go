@@ -80,9 +80,8 @@ func (m *MyDb) CreateItem(name string) (string, error) {
     
     _, err = stmtIns.Exec(name)
     if err != nil {
-        panic(err.Error())
+        return "", err
     }
-
     stmtOut, err := m.db.Prepare("SELECT LAST_INSERT_ID()")
     if err != nil {
         return "", err
