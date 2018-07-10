@@ -5,7 +5,6 @@ import (
     "fmt"
     "os"
     "strconv"
-    "encoding/json"
     "database/sql"
     "github.com/joho/godotenv"
     _ "github.com/go-sql-driver/mysql"
@@ -45,10 +44,11 @@ func (m *MyDb) CloseDb() (error)    {
 // berdasarkan id yang diberikan. Argumen pertama
 // adalah database yang digunakan, dan parameter kedua
 // adalah id dari user yang dicari.
-func (m *MyDb) GetItem(id int) (string, error){
+func (m *MyDb) GetItem(id int) (*Response, error){
+    response := &Response{}
     stmtOut, err := m.db.Prepare("SELECT name FROM item WHERE id = ?")
     if err != nil { 
-        return "", err
+        return response, err
     }
     defer stmtOut.Close()
     
@@ -56,35 +56,32 @@ func (m *MyDb) GetItem(id int) (string, error){
 
     err = stmtOut.QueryRow(id).Scan(&name)
     if err != nil {
-        return "", err
+        return response, err
     }
     payload := make(map[string]string)
     payload["name"] = name
-    response := Response{"OK",payload}
-    js, err := json.Marshal(response)
-    if err != nil {
-        return "", err
-    }
-    return string(js), err
+    response = &Response{"OK",payload}
+    return response, err
 }
 
 // CreateItem akan memasukan user baru kedalam database.
 // Function ini menerima object database sebagai parameter pertama,
 // dan nama user baru dari parameter kedua.
-func (m *MyDb) CreateItem(name string) (string, error) {
+func (m *MyDb) CreateItem(name string) (*Response, error) {
+    response := &Response{}
     stmtIns, err := m.db.Prepare("INSERT INTO item (name) VALUES(?)")
     if err != nil {
-        return "", err 
+        return response, err 
     }
     defer stmtIns.Close()
     
     _, err = stmtIns.Exec(name)
     if err != nil {
-        return "", err
+        return response, err
     }
     stmtOut, err := m.db.Prepare("SELECT LAST_INSERT_ID()")
     if err != nil {
-        return "", err
+        return response, err
     }
     defer stmtOut.Close()
     
@@ -92,61 +89,52 @@ func (m *MyDb) CreateItem(name string) (string, error) {
 
     err = stmtOut.QueryRow().Scan(&id)
     if err != nil {
-        return "", err
+        return response, err
     }
 
     payload := make(map[string]string)
     payload["id"] = strconv.Itoa(id)
-    response := Response{"OK",payload}
-    js, err := json.Marshal(response)
-    if err != nil {
-        return "", err
-    }
-    return string(js), err
+    response = &Response{"OK",payload}
+
+    return response, err
 }
 
 // UpdateItem akan mengganti nama user dengan nama baru.
 // Function ini menerima 3 (tiga) parameter. Parameter
 // pertama adalah object database, parameter kedua adalah id user
 // yang ingin diganti namanya, dan parameter ketiga adalah nama baru.
-func (m *MyDb) UpdateItem(id int, name string) (string, error)    {
+func (m *MyDb) UpdateItem(id int, name string) (*Response, error)    {
+    response := &Response{}
     stmtIns, err := m.db.Prepare("update item set name = ? where id = ?")
     if err != nil {
-        return "", err
+        return response, err
     }
     defer stmtIns.Close()
 
     _, err = stmtIns.Exec(name,id)
     if err != nil {
-        return "", err
+        return response, err
     }
-    response := Response{"OK",make(map[string]string)}
-    js, err := json.Marshal(response)
-    if err != nil {
-        return "", err
-    }
-    return string(js), err  
+    response = &Response{"OK",make(map[string]string)}
+    return response, err  
 }
 
 // DeleteItem akan mengapus data user dari database berdasarkan id.
 // Function ini menerima object database sebagai parameter pertama,
 // dan id user yang ingin dihapus sebagai parameter kedua.
-func (m *MyDb) DeleteItem(id int) (string, error) {
+func (m *MyDb) DeleteItem(id int) (*Response, error) {
+    response := &Response{}
     stmtIns, err := m.db.Prepare("delete from item where id = ?")
     if err != nil {
-        return "", err
+        return response, err
     }
     defer stmtIns.Close()
     
     _, err = stmtIns.Exec(id)
     if err != nil {
-        return "", err
+        return response, err
     }
 
-    response := Response{"OK",make(map[string]string)}
-    js, err := json.Marshal(response)
-    if err != nil {
-        return "", err
-    }
-    return string(js), err  
+    response = &Response{"OK",make(map[string]string)}
+    return response, err  
 }

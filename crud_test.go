@@ -1,7 +1,10 @@
 package crud
 
-import "testing"
-import "gopkg.in/DATA-DOG/go-sqlmock.v1"
+import  (
+    "testing"
+    "encoding/json"
+    "gopkg.in/DATA-DOG/go-sqlmock.v1"
+)
 
 func TestGetUser(t *testing.T)  {
     rows := sqlmock.NewRows([]string{"name"}).
@@ -17,7 +20,12 @@ func TestGetUser(t *testing.T)  {
     if err != nil {
         t.Errorf("something goes wrong 500")
     }
-    if res != "{\"status\":\"OK\",\"payload\":{\"name\":\"item N\"}}" {
+
+    js, err := json.Marshal(res)
+    if err != nil {
+        t.Errorf("wrong json")
+    }
+    if string(js) != "{\"status\":\"OK\",\"payload\":{\"name\":\"item N\"}}" {
         t.Errorf("wrong json")
     }
     // we make sure that all expectations were met
@@ -44,7 +52,12 @@ func TestCreateUser(t *testing.T)   {
     if err != nil {
         t.Errorf("something goes wrong 500")
     }
-    if res != "{\"status\":\"OK\",\"payload\":{\"id\":\"1\"}}" {
+
+    js, err := json.Marshal(res)
+    if err != nil {
+        t.Errorf("wrong json")
+    }
+    if string(js) != "{\"status\":\"OK\",\"payload\":{\"id\":\"1\"}}" {
         t.Errorf("wrong json")
     }
     // we make sure that all expectations were met
@@ -63,10 +76,15 @@ func TestUpdateUser(t *testing.T)   {
     // fmt.Println(CreateItem(db,"item N"))
     mydb := &MyDb{db : db}
     res, err := mydb.UpdateItem(1, "item N new!")
-    if err != nil  {
+    if err != nil {
         t.Errorf("something goes wrong 500")
     }
-    if res != "{\"status\":\"OK\"}" {
+
+    js, err := json.Marshal(res)
+    if err != nil {
+        t.Errorf("wrong json")
+    }
+    if string(js) != "{\"status\":\"OK\"}" {
         t.Errorf("wrong json")
     }
     // we make sure that all expectations were met
@@ -86,9 +104,14 @@ func TestDeleteUser(t *testing.T)   {
     mydb := &MyDb{db : db}
     res, err := mydb.DeleteItem(1)
     if err != nil {
-        t.Errorf("something goes wrong")
+        t.Errorf("something goes wrong 500")
     }
-    if res != "{\"status\":\"OK\"}" {
+
+    js, err := json.Marshal(res)
+    if err != nil {
+        t.Errorf("wrong json")
+    }
+    if string(js) != "{\"status\":\"OK\"}" {
         t.Errorf("wrong json")
     }
     // we make sure that all expectations were met
