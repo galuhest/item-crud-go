@@ -30,7 +30,7 @@ func init() {
 // Function ini akan membuat koneksi terhadap database
 // berdasarkan parameter dalam .env
 func ConnectDb() (*MyDb, error) {
-    db_config := fmt.Sprintf("%s:%s@/%s",os.Getenv("DB_USER"),os.Getenv("DB_PASSWORD"),os.Getenv("DATABASE"))
+    db_config := fmt.Sprintf("%s:%s@%s(%s)/%s",os.Getenv("DB_USER"),os.Getenv("DB_PASSWORD"),os.Getenv("DB_PROTOCOL"),os.Getenv("DB_HOST"),os.Getenv("DATABASE"))
     db, err := sql.Open("mysql", db_config)
     mydb := &MyDb{db : db}
     return mydb, err
